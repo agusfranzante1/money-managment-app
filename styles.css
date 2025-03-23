@@ -2780,3 +2780,32 @@ th.current-month {
 .edit-percentages-button i {
     font-size: 10px;
 }
+
+/* Estilo para el botón de edición */
+.edit-wallet {
+    position: absolute;
+    top: 5px;
+    right: 34px; /* Posicionado a la izquierda del botón de eliminar */
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+.edit-wallet:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Texto de ayuda */
+.help-text {
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 5px;
+}

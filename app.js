@@ -613,26 +613,43 @@ class FinanceManager {
     }
 
     updateWalletsList() {
-        this.walletsList.innerHTML = '';
+        const walletsList = document.getElementById('walletsList');
+        if (!walletsList) return;
+        
+        walletsList.innerHTML = '';
+        
         this.wallets.forEach(wallet => {
-            const card = document.createElement('div');
-            card.className = 'wallet-card';
-            card.style.backgroundColor = wallet.color;
-            card.innerHTML = `
-                <button class="delete-wallet" data-wallet-id="${wallet.id}">
-                    <i class="fas fa-times"></i>
-                </button>
+            const walletCard = document.createElement('div');
+            walletCard.className = 'wallet-card';
+            walletCard.style.backgroundColor = wallet.color || this.getRandomColor();
+            
+            // Contenido de la billetera
+            walletCard.innerHTML = `
                 <div class="wallet-name">${wallet.name}</div>
-                <div class="wallet-balance">${wallet.balance.toFixed(2)} ${wallet.currency}</div>
+                <div class="wallet-balance">${this.formatCurrency(wallet.balance, wallet.currency)}</div>
+                <button class="edit-wallet" title="Editar billetera">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="delete-wallet" title="Eliminar billetera">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
             `;
             
-            const deleteBtn = card.querySelector('.delete-wallet');
+            // Evento para eliminar billetera
+            const deleteBtn = walletCard.querySelector('.delete-wallet');
             deleteBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.confirmDeleteWallet(wallet);
             });
             
-            this.walletsList.appendChild(card);
+            // Evento para editar billetera
+            const editBtn = walletCard.querySelector('.edit-wallet');
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.editWallet(wallet);
+            });
+            
+            walletsList.appendChild(walletCard);
         });
     }
 
@@ -708,22 +725,14 @@ class FinanceManager {
     }
 
     saveToLocalStorage() {
-        // Asegurar que el storage esté limpio antes de guardar
-        localStorage.removeItem('wallets');
-        localStorage.removeItem('transactions');
-        localStorage.removeItem('currencies');
-
-        // Ahora guardar los datos actualizados
         localStorage.setItem('wallets', JSON.stringify(this.wallets));
         localStorage.setItem('transactions', JSON.stringify(this.transactions));
         localStorage.setItem('currencies', JSON.stringify(this.currencies));
         
-        // Imprimir en consola para debug
-        console.log('Datos guardados en localStorage:', {
-            wallets: this.wallets,
-            transactions: this.transactions,
-            currencies: this.currencies
-        });
+        // Actualizar la UI después de guardar
+        this.updateWalletsList();
+        this.updateWalletSelect();
+        this.updateCashFlowTable();
     }
     
     loadFromLocalStorage() {
@@ -2798,6 +2807,171 @@ class FinanceManager {
         
         // Actualizar la vista
         this.updateDistributionCalculator();
+    }
+
+    editWallet(wallet) {
+        // Crear el overlay para el diálogo
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay';
+        
+        // Crear el diálogo
+        const dialog = document.createElement('div');
+        dialog.className = 'wallet-dialog';
+        
+        // Encabezado del diálogo
+        const header = document.createElement('div');
+        header.className = 'dialog-header';
+        header.innerHTML = `
+            <h3>Editar Billetera</h3>
+            <p class="dialog-subtitle">Actualiza los datos de tu billetera</p>
+        `;
+        
+        // Cargar monedas disponibles
+        const currencies = JSON.parse(localStorage.getItem('currencies') || '[]');
+        
+        // Crear formulario
+        const form = document.createElement('form');
+        form.id = 'walletForm';
+        form.innerHTML = `
+            <div class="form-group">
+                <label for="walletName"><i class="fas fa-tag"></i> Nombre de la billetera</label>
+                <input type="text" id="walletName" value="${wallet.name}" placeholder="Ej: Mi billetera principal" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="walletCurrency"><i class="fas fa-money-bill-wave"></i> Moneda</label>
+                <select id="walletCurrency" disabled>
+                    ${currencies.map(curr => `<option value="${curr}" ${curr === wallet.currency ? 'selected' : ''}>${curr}</option>`).join('')}
+                </select>
+                <p class="help-text" style="color: #666; font-size: 0.8em; margin-top: 5px;">La moneda no se puede cambiar una vez creada la billetera.</p>
+            </div>
+            
+            <div class="color-selector">
+                <label><i class="fas fa-palette"></i> Color de la billetera</label>
+                <div class="predefined-colors">
+                    <div class="color-option" style="background-color: #003087" data-color="#003087" ${wallet.color === '#003087' ? 'class="selected"' : ''}></div>
+                    <div class="color-option" style="background-color: #F0B90B" data-color="#F0B90B" ${wallet.color === '#F0B90B' ? 'class="selected"' : ''}></div>
+                    <div class="color-option" style="background-color: #26A17B" data-color="#26A17B" ${wallet.color === '#26A17B' ? 'class="selected"' : ''}></div>
+                    <div class="color-option" style="background-color: #FF9900" data-color="#FF9900" ${wallet.color === '#FF9900' ? 'class="selected"' : ''}></div>
+                    <div class="color-option" style="background-color: #6772E5" data-color="#6772E5" ${wallet.color === '#6772E5' ? 'class="selected"' : ''}></div>
+                    <div class="color-option" style="background-color: #8E44AD" data-color="#8E44AD" ${wallet.color === '#8E44AD' ? 'class="selected"' : ''}></div>
+                    <div class="color-option" style="background-color: #2ECC71" data-color="#2ECC71" ${wallet.color === '#2ECC71' ? 'class="selected"' : ''}></div>
+                    <div class="color-option" style="background-color: #E74C3C" data-color="#E74C3C" ${wallet.color === '#E74C3C' ? 'class="selected"' : ''}></div>
+                    <div class="color-option" style="background-color: #1ABC9C" data-color="#1ABC9C" ${wallet.color === '#1ABC9C' ? 'class="selected"' : ''}></div>
+                    <div class="color-option" style="background-color: #34495E" data-color="#34495E" ${wallet.color === '#34495E' ? 'class="selected"' : ''}></div>
+                    <div class="color-option" style="background-color: #F1C40F" data-color="#F1C40F" ${wallet.color === '#F1C40F' ? 'class="selected"' : ''}></div>
+                    <div class="color-option" style="background-color: #95A5A6" data-color="#95A5A6" ${wallet.color === '#95A5A6' ? 'class="selected"' : ''}></div>
+                </div>
+                
+                <div class="custom-color">
+                    <input type="text" id="customColorHex" value="${wallet.color}" placeholder="#RRGGBB" pattern="^#[0-9A-Fa-f]{6}$">
+                    <input type="color" id="customColorPicker" value="${wallet.color}">
+                </div>
+            </div>
+            
+            <div class="color-preview">
+                <span class="color-label">Vista previa del color:</span>
+                <div class="wallet-color-preview" style="background-color: ${wallet.color}"></div>
+            </div>
+            
+            <div class="dialog-buttons">
+                <button type="button" class="cancel-btn"><i class="fas fa-times"></i> Cancelar</button>
+                <button type="submit" class="confirm-btn"><i class="fas fa-save"></i> Guardar Cambios</button>
+            </div>
+        `;
+        
+        // Agregar eventos para la selección de color
+        const setupColorSelectors = () => {
+            const colorOptions = form.querySelectorAll('.color-option');
+            const customColorHex = form.querySelector('#customColorHex');
+            const customColorPicker = form.querySelector('#customColorPicker');
+            const colorPreview = form.querySelector('.wallet-color-preview');
+            
+            // Función para actualizar el color seleccionado
+            const updateSelectedColor = (color) => {
+                // Deseleccionar todas las opciones
+                colorOptions.forEach(opt => opt.classList.remove('selected'));
+                
+                // Actualizar inputs
+                customColorHex.value = color;
+                customColorPicker.value = color;
+                
+                // Actualizar vista previa
+                colorPreview.style.backgroundColor = color;
+                
+                // Seleccionar la opción correspondiente si existe
+                colorOptions.forEach(opt => {
+                    if (opt.dataset.color === color) {
+                        opt.classList.add('selected');
+                    }
+                });
+            };
+            
+            // Eventos para opciones predefinidas
+            colorOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const color = option.dataset.color;
+                    updateSelectedColor(color);
+                });
+            });
+            
+            // Eventos para color personalizado
+            customColorPicker.addEventListener('input', () => {
+                updateSelectedColor(customColorPicker.value);
+            });
+            
+            customColorHex.addEventListener('input', () => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(customColorHex.value)) {
+                    updateSelectedColor(customColorHex.value);
+                }
+            });
+        };
+        
+        // Agregar elementos al DOM
+        dialog.appendChild(header);
+        dialog.appendChild(form);
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        
+        // Configurar selectores de color después de agregar al DOM
+        setupColorSelectors();
+        
+        // Manejar el envío del formulario
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('walletName').value.trim();
+            const color = document.getElementById('customColorHex').value;
+            
+            if (name) {
+                // Actualizar la billetera
+                wallet.name = name;
+                wallet.color = color;
+                
+                // Guardar cambios
+                this.saveToLocalStorage();
+                this.updateWalletsList();
+                
+                // Cerrar diálogo
+                document.body.removeChild(overlay);
+                
+                // Mostrar mensaje de éxito
+                this.showSuccessMessage('Billetera actualizada correctamente');
+            } else {
+                alert('Por favor, ingrese un nombre para la billetera');
+            }
+        });
+        
+        // Manejar clic en cancelar
+        const cancelButton = form.querySelector('.cancel-btn');
+        cancelButton.addEventListener('click', () => {
+            document.body.removeChild(overlay);
+        });
+        
+        // Enfocar en el campo de nombre al abrir
+        setTimeout(() => {
+            document.getElementById('walletName').focus();
+        }, 100);
     }
 }
 

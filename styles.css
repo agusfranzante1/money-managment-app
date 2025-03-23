@@ -1,0 +1,2782 @@
+.container {
+    width: calc(100% - 60px);
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    max-width: 1800px;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin: 20px 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.cash-flow-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.cash-flow-table th,
+.cash-flow-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    font-size: 14px;
+}
+
+.cash-flow-table th:first-child,
+.cash-flow-table td:first-child {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 1;
+}
+
+.cash-flow-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.current-month {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.positive { color: #4CAF50; }
+.negative { color: #F44336; }
+
+.cash-flow-table col:first-child {
+    width: 150px;
+}
+
+.cash-flow-table col:not(:first-child) {
+    width: calc((100% - 150px) / 12);
+}
+
+.cash-flow-table th,
+.cash-flow-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.concept-cell {
+    width: 150px;
+    text-align: left;
+    padding-left: 12px !important;
+}
+
+.month-cell {
+    text-align: center;
+}
+
+.amount-cell {
+    text-align: center !important;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.currency-header {
+    background-color: #f8f9fa;
+}
+
+.currency-header .handle {
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.income-row td:not(.concept-cell) {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+.expense-row td:not(.concept-cell) {
+    background-color: rgba(244, 67, 54, 0.1);
+}
+
+.separator-row {
+    height: 16px;
+    background: #f5f5f5;
+    background-image: linear-gradient(to right, #fafafa, #e0e0e0, #fafafa);
+    border: none;
+}
+
+.separator-row.bigger-separator {
+    height: 32px;
+    margin: 10px 0;
+    background-image: linear-gradient(to right, #f0f8ff, #d8e8fa, #f0f8ff);
+}
+
+.separator-row td {
+    padding: 0;
+    height: 100%;
+}
+
+/* Encabezados */
+thead {
+    background-color: #f8f9fa;
+}
+
+th {
+    padding: 16px;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e9ecef;
+    text-align: center;
+}
+
+th:first-child {
+    text-align: left;
+    padding-left: 24px;
+}
+
+/* Celdas */
+td {
+    padding: 12px 16px;
+    color: #495057;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+td:first-child {
+    text-align: left;
+    padding-left: 24px;
+}
+
+/* Encabezados de sección */
+.section-header {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.section-header td {
+    background: linear-gradient(to right, #e6f2ff, #f0f7ff);
+    color: #2962FF;
+    font-size: 1.1em;
+    text-align: center;
+    padding: 12px 0;
+    letter-spacing: 1px;
+    position: relative;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.section-header td::before,
+.section-header td::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 30px;
+    height: 1px;
+    background-color: #2196F3;
+}
+
+.section-header td::before {
+    left: 20%;
+}
+
+.section-header td::after {
+    right: 20%;
+}
+
+/* Estilo mejorado para las filas de totales */
+.total-row {
+    background-color: #f9f9f9;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    padding: 4px 0;
+}
+
+.total-row td {
+    border: 1px solid #e0e0e0;
+    color: #333;
+    padding: 10px 8px;
+    vertical-align: middle;
+}
+
+.total-row td.concept-cell {
+    color: #0d47a1;
+    font-weight: bold;
+    padding-left: 15px;
+}
+
+.total-row td.amount-cell {
+    color: #2e7d32;
+    font-weight: 600;
+    text-align: right;
+    padding-right: 15px;
+}
+
+.total-row td.current-month {
+    background-color: #e8f5e9;
+    color: #1b5e20;
+    font-weight: bold;
+}
+
+/* Estilos específicos por moneda */
+/* USD */
+.section-header[data-currency="USD"] {
+    background-color: #e3f2fd;
+}
+
+.section-header[data-currency="USD"] td {
+    color: #1976D2;
+}
+
+/* EUR */
+.section-header[data-currency="EUR"] {
+    background-color: #e8f5e9;
+}
+
+.section-header[data-currency="EUR"] td {
+    color: #2E7D32;
+}
+
+/* ARS */
+.section-header[data-currency="ARS"] {
+    background-color: #fff3e0;
+}
+
+.section-header[data-currency="ARS"] td {
+    color: #F57C00;
+}
+
+/* Hover effects */
+tbody tr:hover:not(.section-header) {
+    background-color: #f8f9fa;
+}
+
+/* Responsive scroll suave */
+.table-container {
+    scrollbar-width: thin;
+    scrollbar-color: #2196F3 #f0f0f0;
+}
+
+.table-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background-color: #2196F3;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.income-row {
+    background-color: #e8f5e9;
+}
+
+.expense-row {
+    background-color: #ffebee;
+}
+
+.editable:hover {
+    background-color: #fff3e0;
+    cursor: pointer;
+}
+
+.balance-section {
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.form-section {
+    margin-bottom: 30px;
+}
+
+form {
+    display: grid;
+    gap: 10px;
+}
+
+.transactions-section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.transaction-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ingreso {
+    color: green;
+}
+
+.egreso {
+    color: red;
+}
+
+.wallets-container {
+    margin-bottom: 30px;
+    margin-top: 20px;
+}
+
+.wallets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.wallet-card {
+    padding: 15px;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    min-height: 100px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.wallet-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.25);
+}
+
+.wallet-name {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.wallet-balance {
+    font-size: 1.2em;
+    margin-top: auto;
+}
+
+.transaction-form {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.transaction-form h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.transaction-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.transaction-form select,
+.transaction-form input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.transaction-form button {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    align-self: flex-end;
+}
+
+.transaction-form button:hover {
+    background-color: #45a049;
+}
+
+/* Colores para las billeteras */
+.wallet-paypal { background-color: #003087; }
+.wallet-binance { background-color: #F0B90B; }
+.wallet-usdt { background-color: #26A17B; }
+/* Agregar más colores según necesites */
+
+.delete-wallet {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+.delete-wallet:hover {
+    background: rgba(255, 0, 0, 0.3);
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.confirm-dialog {
+    width: 500px;
+    max-width: 95%;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.confirm-dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.confirm-dialog button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.confirm-dialog .confirm {
+    background-color: #dc3545;
+    color: white;
+}
+
+.confirm-dialog .cancel {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Estilos para el diálogo de transferencia */
+.transfer-dialog {
+    width: 400px;
+    max-width: 90%;
+}
+
+.transfer-dialog .form-group {
+    margin-bottom: 15px;
+}
+
+.transfer-dialog label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.transfer-dialog select,
+.transfer-dialog input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.transfer-btn {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.transfer-btn:hover {
+    background-color: #1976D2;
+}
+
+/* Estilos para las transacciones de transferencia */
+.transfer_out {
+    color: #f44336;
+}
+
+.transfer_in {
+    color: #4CAF50;
+}
+
+/* Estilos para los botones de acción */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+/* Estilo común para ambos botones */
+.action-buttons button {
+    flex: 1;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    height: 42px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 200px;
+}
+
+.action-buttons button:hover {
+    background-color: #1976D2;
+}
+
+/* Estilos para el diálogo de registro */
+.register-dialog {
+    width: 400px;
+    max-width: 90%;
+}
+
+.register-dialog .form-group {
+    margin-bottom: 15px;
+}
+
+.register-dialog label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.register-dialog select,
+.register-dialog input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Eliminar el formulario anterior si existe */
+.transaction-form {
+    display: none;
+}
+
+/* Asegurar que el body y html no tengan márgenes */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Responsive para diferentes tamaños de pantalla */
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .action-buttons button {
+        width: 100%;
+    }
+
+    .container {
+        width: calc(100% - 30px);
+        padding: 15px;
+    }
+}
+
+/* Estilos para el encabezado del flujo de caja */
+.cash-flow-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.currency-manager {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #e9f5fe;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 1px solid #90caf9;
+}
+
+.add-currency-btn {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.add-currency-btn:hover {
+    background-color: #1976D2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.currencies-list {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.currency-tag {
+    background-color: #fff;
+    padding: 8px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #90caf9;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.currency-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.currency-code {
+    font-weight: 600;
+    color: #1976D2;
+}
+
+.delete-currency-btn {
+    background: #f8f9fa;
+    border: none;
+    padding: 5px;
+    height: 24px;
+    width: 24px;
+    cursor: pointer;
+    color: #dc3545;
+    font-size: 0.9em;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.delete-currency-btn:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.no-currencies-message {
+    text-align: center;
+    padding: 20px;
+    background-color: #fff3e0;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+/* Estilos para el formulario de moneda */
+#currencyForm input {
+    text-transform: uppercase;
+}
+
+/* Estilos para el selector de monedas */
+#walletCurrency {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+}
+
+#walletCurrency option {
+    padding: 8px;
+}
+
+/* Eliminar el formulario anterior si existe */
+.transaction-form {
+    display: none;
+}
+
+/* Asegurar que el body y html no tengan márgenes */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Responsive para diferentes tamaños de pantalla */
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .action-buttons button {
+        width: 100%;
+    }
+
+    .container {
+        width: calc(100% - 30px);
+        padding: 15px;
+    }
+}
+
+/* Estilos para el encabezado del flujo de caja */
+.cash-flow-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.currency-manager {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.add-currency-btn {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.add-currency-btn:hover {
+    background-color: #1976D2;
+}
+
+.currencies-list {
+    display: flex;
+    gap: 10px;
+}
+
+.currency-tag {
+    background-color: #f8f9fa;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.currency-code {
+    font-weight: 500;
+    color: #2196F3;
+}
+
+.delete-currency-btn {
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 0.9em;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+}
+
+.delete-currency-btn:hover {
+    color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.no-currencies-message {
+    text-align: center;
+    padding: 20px;
+    background-color: #fff3e0;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+/* Estilos para el formulario de moneda */
+#currencyForm input {
+    text-transform: uppercase;
+}
+
+/* Estilos para el selector de monedas */
+#walletCurrency {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+}
+
+#walletCurrency option {
+    padding: 8px;
+}
+
+/* Estilo para el mensaje de error cuando no hay monedas */
+.alert-message {
+    background-color: #fff3e0;
+    color: #f57c00;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Estilos para el diálogo de nueva billetera */
+.wallet-dialog {
+    width: 400px;
+    max-width: 95%;
+    padding: 0;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.dialog-header {
+    background-color: #2196F3;
+    color: white;
+    padding: 20px 24px;
+    margin: -1px -1px 0 -1px;
+}
+
+.dialog-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.dialog-subtitle {
+    margin: 5px 0 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+#walletForm {
+    padding: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #495057;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group label i {
+    margin-right: 8px;
+    color: #2196F3;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #2196F3;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.color-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.color-label {
+    color: #495057;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.wallet-color-preview {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+.dialog-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.dialog-buttons button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.cancel-btn {
+    background-color: #f8f9fa;
+    color: #495057;
+}
+
+.cancel-btn:hover {
+    background-color: #e9ecef;
+}
+
+.confirm-btn {
+    background-color: #2196F3;
+    color: white;
+}
+
+.confirm-btn:hover {
+    background-color: #1976D2;
+}
+
+/* Animación de entrada para el diálogo */
+.wallet-dialog {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Asegúrate de incluir Font Awesome en el HTML */
+
+/* Agregar estos estilos para el selector de color */
+.color-selector {
+    margin-top: 10px;
+}
+
+.predefined-colors {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.color-option {
+    width: 100%;
+    padding-bottom: 100%; /* Hace que sea cuadrado */
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px #000;
+}
+
+.custom-color {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.custom-color input[type="text"] {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.custom-color input[type="color"] {
+    width: 50px;
+    height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.custom-color input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.custom-color input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 8px;
+}
+
+/* Estilo para error en el input hexadecimal */
+.custom-color input[type="text"]:invalid {
+    border-color: #f44336;
+    background-color: #ffebee;
+}
+
+/* Agregar estos estilos para el mes actual */
+.current-month {
+    background-color: #e8f5e9;
+    font-weight: bold;
+}
+
+/* Estilo para el encabezado del mes actual */
+th.current-month {
+    background-color: #4CAF50 !important;
+    color: white !important;
+    font-weight: 700;
+}
+
+/* Quitar el fondo verde de las celdas del mes actual */
+td.current-month {
+    background-color: transparent !important;
+    font-weight: 600;
+}
+
+/* Efecto hover para celdas del mes actual */
+tr:hover td.current-month {
+    background-color: rgba(76, 175, 80, 0.15) !important;
+}
+
+/* Ajuste para la sección header cuando coincide con mes actual */
+.section-header td.current-month {
+    background-color: rgba(76, 175, 80, 0.05) !important;
+}
+
+/* Estilos para el diálogo de confirmación */
+.dialog-header.warning {
+    background-color: #dc3545;
+}
+
+.warning-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #FFC107;
+    color: #856404;
+    padding: 15px 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+}
+
+.warning-message i {
+    color: #856404;
+    font-size: 1.2em;
+}
+
+.warning-message p {
+    margin: 0;
+    color: #856404;
+    font-size: 0.9em;
+}
+
+.delete-btn {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.delete-btn:hover {
+    background-color: #c82333 !important;
+}
+
+/* Estilos para el encabezado de moneda y botón de eliminar */
+.currency-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.drag-handle {
+    cursor: grab;
+    padding: 0 4px;
+    color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.currency-header span {
+    margin-right: auto;
+    padding-left: 0;
+}
+
+.delete-currency-btn {
+    margin-left: auto;
+}
+
+.section-header td {
+    text-align: left;
+    padding-left: 12px;
+}
+
+/* Estilos para drag and drop */
+.currency-group {
+    display: table-row-group;
+    background: white;
+}
+
+.currency-header {
+    cursor: move;
+}
+
+.handle {
+    cursor: grab;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.handle i {
+    color: #666;
+}
+
+.currency-group.sortable-ghost {
+    opacity: 0.4;
+}
+
+.currency-group.sortable-drag {
+    opacity: 0.8;
+    background: white;
+}
+
+/* Estilos para el selector de categorías */
+.category-select-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.category-select-container select {
+    flex: 1;
+    height: 36px; /* Asegurar que el select y el botón tengan la misma altura */
+}
+
+.add-category-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px; /* Asegurar un ancho mínimo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    padding: 0;
+}
+
+.add-category-btn:hover {
+    background-color: #45a049;
+}
+
+.add-category-btn i {
+    font-size: 14px; /* Ajustar tamaño del ícono */
+}
+
+/* Asegurar que el formulario y sus grupos tengan el espacio adecuado */
+.form-group {
+    margin-bottom: 16px;
+}
+
+/* Estilos para el select */
+select, input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Estilos para los grupos de opciones */
+optgroup {
+    font-weight: 600;
+    color: #666;
+}
+
+optgroup option {
+    font-weight: normal;
+    padding-left: 15px;
+}
+
+.category-group {
+    margin-bottom: 1rem;
+}
+
+.category-input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.category-input-group select {
+    flex: 1;
+}
+
+.icon-button {
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #007bff;
+    font-size: 1.1rem;
+}
+
+.icon-button:hover {
+    color: #0056b3;
+}
+
+/* Estilos para el flujo de caja */
+.current-month {
+    background-color: #e8f5e9;
+    font-weight: bold;
+}
+
+.handle {
+    cursor: grab;
+    padding: 8px;
+    background-color: #f8f9fa;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.handle i {
+    color: #999;
+}
+
+.currency-row td {
+    padding: 8px;
+}
+
+.total-row {
+    font-weight: bold;
+    background-color: #f5f5f5;
+}
+
+/* Estilos para el grupo de moneda */
+.currency-group {
+    background-color: white;
+    cursor: move;
+}
+
+/* Estilos para el ícono de arrastre */
+.handle {
+    cursor: grab;
+    padding: 8px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.handle i {
+    color: #999;
+}
+
+/* Estilos para cuando se está arrastrando */
+.currency-group.dragging {
+    opacity: 0.5;
+    background-color: #f8f9fa;
+}
+
+/* Separador entre grupos de monedas */
+.separator-row {
+    height: 20px;
+    background-color: #f5f5f5;
+}
+
+#currencyGroupsContainer {
+    width: 100%;
+}
+
+.currency-group {
+    background: white;
+    margin-bottom: 1px;
+    cursor: default;
+}
+
+.currency-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.handle {
+    cursor: grab;
+    padding: 8px 12px;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #f8f9fa;
+}
+
+.handle i {
+    color: #666;
+}
+
+.handle:hover {
+    background-color: #e9ecef;
+}
+
+.separator-row {
+    height: 8px;
+    background-color: #f8f9fa;
+}
+
+/* Estilo cuando se está arrastrando */
+.sortable-ghost {
+    opacity: 0.5;
+    background-color: #e9ecef;
+}
+
+/* Estilo para el mes actual (solo en el encabezado) */
+thead th.current-month {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#cashFlowTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#cashFlowTable th,
+#cashFlowTable td {
+    padding: 8px;
+    text-align: right;
+    border: 1px solid #ddd;
+}
+
+#cashFlowTable th:first-child,
+#cashFlowTable td:first-child {
+    text-align: left;
+}
+
+#cashFlowTable thead th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+#cashFlowTable thead th.current-month {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.handle {
+    cursor: grab;
+    padding: 8px;
+    background-color: #f8f9fa;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.handle i {
+    color: #666;
+}
+
+.currency-group {
+    background: white;
+}
+
+.separator-row td {
+    height: 10px;
+    background-color: #f8f9fa;
+    border: none !important;
+}
+
+.positive {
+    color: #4CAF50;
+}
+
+.negative {
+    color: #F44336;
+}
+
+.total-row {
+    font-weight: bold;
+}
+
+.currency-header td {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    text-align: left !important;
+}
+
+.currency-header td:not(:first-child) {
+    text-align: center !important;
+}
+
+.income-row td:not(:first-child) {
+    color: #4CAF50;
+}
+
+.expense-row td:not(:first-child) {
+    color: #F44336;
+}
+
+.handle {
+    cursor: grab;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.handle i {
+    color: #666;
+}
+
+.currency-group {
+    background: white;
+}
+
+.separator-row td {
+    height: 10px;
+    background-color: #f8f9fa;
+    border: none !important;
+}
+
+#cashFlowTable td {
+    padding: 8px;
+    text-align: right;
+    border: 1px solid #ddd;
+}
+
+#cashFlowTable td:first-child {
+    text-align: left;
+}
+
+/* Asegurar que los números estén alineados */
+.income-row td:not(:first-child),
+.expense-row td:not(:first-child),
+.total-row td:not(:first-child) {
+    font-family: 'Roboto Mono', monospace;
+    text-align: center;
+}
+
+/* Ajustar el encabezado del mes actual */
+th.current-month {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Ajustar las celdas del mes actual */
+td.current-month {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+/* Mejorar la visualización de los separadores */
+.separator-row td {
+    height: 8px;
+    background-color: #f8f9fa;
+    border: none !important;
+    padding: 0 !important;
+}
+
+.currency-header .handle {
+    cursor: grab;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.currency-header .handle i {
+    color: #666;
+}
+
+.currency-header {
+    background-color: #f8f9fa;
+}
+
+/* Estilos para los números */
+.income-row td:not(:first-child),
+.expense-row td:not(:first-child),
+.total-row td:not(:first-child) {
+    font-family: 'Roboto Mono', monospace;
+    text-align: center;
+}
+
+/* Estilo para el encabezado de moneda */
+.currency-header .handle {
+    text-align: left;
+    padding: 8px;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Ajustes para el mes actual */
+th.current-month {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Separador entre grupos de moneda */
+.separator-row td {
+    height: 8px;
+    background-color: #f8f9fa;
+    padding: 0;
+}
+
+/* Ajuste para los íconos en la primera columna */
+.cash-flow-table td:first-child i {
+    margin-right: 8px;
+    width: 16px;
+}
+
+.handle {
+    cursor: grab;
+}
+
+.currency-header td:first-child {
+    background-color: #f8f9fa;
+}
+
+/* Mensaje de éxito */
+.success-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+}
+
+.success-message i {
+    font-size: 1.2em;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Estilos para el botón de agregar categoría */
+.add-category-row {
+    background-color: #f9f9f9;
+}
+
+.add-category-button {
+    background-color: transparent;
+    color: #2196F3;
+    border: 1px dashed #2196F3;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+    margin: 8px 0;
+}
+
+.add-category-button:hover {
+    background-color: rgba(33, 150, 243, 0.1);
+    color: #1976D2;
+}
+
+.add-category-button i {
+    font-size: 10px;
+}
+
+/* Estilo para mensaje de advertencia */
+.warning-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #FFC107;
+    color: #856404;
+    padding: 15px 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+}
+
+/* Estilos para la celda de categoría con botón de eliminar */
+.category-cell-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.category-cell-content span {
+    flex-grow: 1;
+}
+
+.delete-category-button {
+    background-color: transparent;
+    color: #dc3545;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.3;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+    margin-left: 8px;
+}
+
+.delete-category-button:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    opacity: 1;
+}
+
+.income-row:hover .delete-category-button {
+    opacity: 0.7;
+}
+
+/* Asegúrate de que la celda de concepto tenga posición relativa */
+.concept-cell {
+    position: relative;
+    width: 150px;
+    text-align: left;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+}
+
+/* Estilo para el diálogo de añadir categoría */
+.add-category-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 350px;
+    max-width: 90%;
+    animation: fadeIn 0.2s ease;
+}
+
+.add-category-dialog h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 18px;
+}
+
+.add-category-dialog input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.add-category-dialog .button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.add-category-dialog button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.add-category-dialog button.save-button {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.add-category-dialog button.save-button:hover {
+    background-color: #45a049;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -55%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+/* Estilos para filas de porcentajes */
+.percentage-row {
+    background-color: #f8f8f8;
+    transition: background-color 0.2s;
+}
+
+.percentage-row:hover {
+    background-color: #edf5ff;
+}
+
+.percentage-cell {
+    color: #333 !important;
+    font-weight: 500 !important;
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+}
+
+/* Destacar la columna de marzo específicamente */
+.march-cell {
+    background-color: #e8f5e9 !important;
+    color: #1b5e20 !important;
+    font-weight: 600 !important;
+    border: 1px solid #a5d6a7 !important;
+}
+
+.percentage-row .concept-cell {
+    color: #0d47a1;
+    font-weight: 600;
+    padding-left: 15px;
+}
+
+/* Encabezado específico para la sección de porcentajes */
+.percentages-header td {
+    background: linear-gradient(to right, #e3f2fd, #bbdefb) !important;
+    color: #0d47a1 !important;
+    padding: 15px 0 !important;
+    font-size: 1.15em !important;
+    border-top: 2px solid #90caf9 !important;
+    border-bottom: 2px solid #90caf9 !important;
+}
+
+/* Estilos para el botón de historial y la sección de historial */
+.header-with-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.show-history-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s;
+}
+
+.show-history-btn:hover {
+    background-color: #3e8e41;
+}
+
+.transaction-history {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.history-header {
+    background-color: #f8f9fa;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.history-header h3 {
+    margin: 0;
+    color: #333;
+}
+
+.close-history-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+.close-history-btn:hover {
+    color: #343a40;
+}
+
+.history-filters {
+    display: flex;
+    padding: 15px;
+    gap: 15px;
+    border-bottom: 1px solid #e9ecef;
+    flex-wrap: wrap;
+}
+
+.history-filters select, 
+.history-filters input {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.date-filter {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.history-list {
+    padding: 0;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.history-item {
+    padding: 15px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.history-item:hover {
+    background-color: #f8f9fa;
+}
+
+.transaction-details {
+    flex-grow: 1;
+}
+
+.transaction-type {
+    font-weight: bold;
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.type-income {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.type-expense {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.type-transfer {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.transaction-amount {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.amount-positive {
+    color: #28a745;
+}
+
+.amount-negative {
+    color: #dc3545;
+}
+
+.transaction-wallet, 
+.transaction-category, 
+.transaction-description,
+.transaction-date {
+    font-size: 14px;
+    color: #6c757d;
+    margin: 2px 0;
+}
+
+.transaction-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.delete-transaction-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    transition: background-color 0.3s;
+}
+
+.delete-transaction-btn:hover {
+    background-color: #c82333;
+}
+
+.no-transactions {
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.delete-dialog .warning-text {
+    color: #FF4B4B;
+    font-weight: bold;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: rgba(255, 75, 75, 0.1);
+    border-radius: 4px;
+    border-left: 4px solid #FF4B4B;
+}
+
+.delete-dialog ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.delete-dialog li {
+    margin-bottom: 5px;
+}
+
+.delete-btn {
+    background-color: #FF4B4B;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.delete-btn:hover {
+    background-color: #ff2c2c;
+}
+
+.cancel-btn {
+    background-color: #e0e0e0;
+    color: #333;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.2s;
+}
+
+.cancel-btn:hover {
+    background-color: #d0d0d0;
+}
+
+.currency-prompt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background-color: #fff3cd;
+    border-radius: 8px;
+    color: #856404;
+    font-size: 14px;
+    border: 1px solid #ffeeba;
+    animation: pulse 1.5s infinite;
+}
+
+.highlight-btn {
+    animation: pulse 1.5s infinite;
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.3);
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(33, 150, 243, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+    }
+}
+
+/* Estilos para la barra de navegación */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 15px 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo i {
+    background-color: #00C49A;
+    color: white;
+    font-size: 18px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo span {
+    font-weight: 600;
+    font-size: 18px;
+    color: #333;
+}
+
+.navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 0 20px;
+    height: 100%;
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-icon {
+    background-color: #00C49A;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+}
+
+.logo-text {
+    font-weight: 600;
+    font-size: 18px;
+    color: #333;
+}
+
+.navbar-menu {
+    display: flex;
+    gap: 30px;
+}
+
+.navbar-item {
+    color: #666;
+    text-decoration: none;
+    font-size: 15px;
+    position: relative;
+    transition: color 0.3s;
+    padding: 5px 0;
+}
+
+.navbar-item:hover {
+    color: #00C49A;
+}
+
+.navbar-item.active {
+    color: #00C49A;
+}
+
+.navbar-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #00C49A;
+    border-radius: 3px;
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.register-btn, .transfer-btn, .history-btn {
+    background-color: #4655D0;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 36px;
+    box-sizing: border-box;
+    margin: 0;
+    line-height: 1;
+}
+
+.register-btn:hover, .transfer-btn:hover, .history-btn:hover {
+    background-color: #3A48B7;
+}
+
+.transfer-btn {
+    background-color: #00C49A;
+}
+
+.transfer-btn:hover {
+    background-color: #00A881;
+}
+
+.history-btn {
+    background-color: #FF9800;
+}
+
+.history-btn:hover {
+    background-color: #F57C00;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #F0F0F0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.user-name {
+    font-weight: 500;
+    font-size: 14px;
+    color: #333;
+}
+
+.user-role {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Ajuste al contenedor principal para dar espacio a la navbar */
+.container {
+    margin-top: 20px;
+}
+
+/* Estilos responsivos para la barra de navegación */
+@media (max-width: 992px) {
+    .navbar-menu {
+        display: none;
+    }
+    
+    .user-info .user-role,
+    .user-info .fa-chevron-down {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .logo-text,
+    .user-name {
+        display: none;
+    }
+    
+    .navbar-container {
+        padding: 0 10px;
+    }
+}
+
+/* Estilos para los botones de la barra de navegación */
+.nav-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.add-button {
+    background-color: #00C49A;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s;
+}
+
+.add-button:hover {
+    background-color: #00A881;
+}
+
+.transfer-button {
+    background-color: #4655D0;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s;
+}
+
+.transfer-button:hover {
+    background-color: #3A46B1;
+}
+
+.logout-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+    background-color: #d32f2f;
+}
+
+/* Estilos para verificación de enlace mágico */
+.verification-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.verification-message {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+}
+
+.verification-message h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.verification-message p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.loader {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #00C49A;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Estilos para el enlace de la calculadora de distribución */
+.nav-link {
+    margin-left: 20px;
+    color: #00C49A;
+    text-decoration: none;
+    position: relative;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -3px;
+    left: 0;
+    background-color: #00C49A;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #008e6c;
+}
+
+.nav-link:hover::after {
+    height: 3px;
+    background-color: #008e6c;
+}
+
+/* Estilos para la Calculadora de Distribución */
+.distribution-calculator {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 640px;
+    max-width: 95%;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+}
+
+.calculator-header {
+    background-color: #00C49A;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.calculator-header h3 {
+    color: white;
+    margin: 0;
+    font-size: 18px;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.close-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.calculator-content {
+    padding: 20px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.amount-input-container {
+    position: relative;
+}
+
+.amount-input-container input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+
+.amount-input-container input:focus {
+    border-color: #00C49A;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 196, 154, 0.2);
+}
+
+.distribution-container {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.distribution-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.distribution-row:last-child {
+    margin-bottom: 0;
+}
+
+.distribution-item {
+    flex: 1;
+    background-color: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.distribution-item h4 {
+    margin: 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.percentage-input-container {
+    display: flex;
+    align-items: center;
+    background-color: #f1f3f5;
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+
+.percentage-input-container input {
+    border: none;
+    background: none;
+    width: 100%;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    outline: none;
+}
+
+.percentage-symbol {
+    color: #888;
+    font-weight: 500;
+}
+
+.amount-result {
+    font-size: 22px;
+    font-weight: 600;
+    color: #00C49A;
+    text-align: center;
+    padding: 5px;
+    background-color: #e6f8f5;
+    border-radius: 6px;
+}
+
+.total-percentage-display {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.percentage-bar {
+    height: 20px;
+    border-radius: 10px;
+    background-color: #e9ecef;
+    display: flex;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.percentage-segment {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.percentage-segment.investment {
+    background-color: #4655D0;
+}
+
+.percentage-segment.savings {
+    background-color: #00C49A;
+}
+
+.percentage-segment.expenses {
+    background-color: #F67280;
+}
+
+.percentage-segment.target-savings {
+    background-color: #FFC75F;
+}
+
+.total-percentage {
+    text-align: right;
+    font-weight: 500;
+    color: #333;
+}
+
+.total-percentage span {
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.calculator-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.calculator-buttons button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.calculate-button {
+    background-color: #00C49A;
+    color: white;
+}
+
+.calculate-button:hover {
+    background-color: #00A881;
+}
+
+.reset-button {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.reset-button:hover {
+    background-color: #dee2e6;
+}
+
+/* Estilos responsivos */
+@media (max-width: 600px) {
+    .distribution-row {
+        flex-direction: column;
+    }
+    
+    .distribution-item {
+        width: 100%;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilos para el botón de editar porcentajes */
+.edit-percentages-row {
+    background-color: #f9f9f9;
+}
+
+.edit-percentages-button {
+    background-color: transparent;
+    color: #4655D0;
+    border: 1px dashed #4655D0;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+    margin: 8px 0;
+}
+
+.edit-percentages-button:hover {
+    background-color: rgba(70, 85, 208, 0.1);
+    color: #3A48B7;
+}
+
+.edit-percentages-button i {
+    font-size: 10px;
+}

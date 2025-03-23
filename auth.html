@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión | Gestión Financiera</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .auth-logo {
+            background-color: #00C49A;
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 30px;
+            margin: 0 auto 15px;
+        }
+        
+        .auth-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .auth-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 0;
+        }
+        
+        .auth-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .auth-input:focus {
+            border-color: #00C49A;
+            outline: none;
+        }
+        
+        .auth-btn {
+            background-color: #00C49A;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .auth-btn:hover {
+            background-color: #00A881;
+        }
+        
+        .auth-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #999;
+        }
+        
+        .auth-divider::before,
+        .auth-divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .auth-divider span {
+            padding: 0 10px;
+            font-size: 14px;
+        }
+        
+        .auth-link {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+        }
+        
+        .auth-link a {
+            color: #00C49A;
+            text-decoration: none;
+        }
+        
+        .auth-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .auth-error {
+            background-color: #FEE2E2;
+            color: #B91C1C;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .auth-success {
+            background-color: #DCFCE7;
+            color: #166534;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background-color: #f5f5f5;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .auth-tab.active {
+            border-bottom: 2px solid #00C49A;
+            color: #00C49A;
+            background-color: white;
+        }
+        
+        .auth-form-container {
+            display: none;
+        }
+        
+        .auth-form-container.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="auth-logo">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <h1 class="auth-title">Gestión Financiera</h1>
+            <p class="auth-subtitle">Inicia sesión o regístrate para continuar</p>
+        </div>
+        
+        <div class="auth-tabs">
+            <div class="auth-tab active" data-tab="login">Iniciar sesión</div>
+            <div class="auth-tab" data-tab="register">Registrarse</div>
+        </div>
+        
+        <div class="auth-error" id="authError"></div>
+        <div class="auth-success" id="authSuccess"></div>
+        
+        <!-- Formulario de inicio de sesión -->
+        <div class="auth-form-container active" id="loginForm">
+            <form class="auth-form" id="loginFormElement">
+                <div class="form-group">
+                    <label for="loginEmail">Correo electrónico</label>
+                    <input type="email" id="loginEmail" class="auth-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword" class="auth-input" required>
+                </div>
+                <button type="submit" class="auth-btn" id="loginBtn">Iniciar sesión</button>
+            </form>
+            
+            <div class="auth-divider">
+                <span>o</span>
+            </div>
+            
+            <button class="auth-btn" id="magicLinkBtn" style="background-color: #4655D0;">
+                Iniciar sesión con enlace mágico
+            </button>
+            
+            <p class="auth-link">
+                ¿No tienes una cuenta? <a href="#" id="showRegisterForm">Regístrate</a>
+            </p>
+        </div>
+        
+        <!-- Formulario de registro -->
+        <div class="auth-form-container" id="registerForm">
+            <form class="auth-form" id="registerFormElement">
+                <div class="form-group">
+                    <label for="registerEmail">Correo electrónico</label>
+                    <input type="email" id="registerEmail" class="auth-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Contraseña</label>
+                    <input type="password" id="registerPassword" class="auth-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar contraseña</label>
+                    <input type="password" id="confirmPassword" class="auth-input" required>
+                </div>
+                <button type="submit" class="auth-btn" id="registerBtn">Registrarse</button>
+            </form>
+            
+            <p class="auth-link">
+                ¿Ya tienes una cuenta? <a href="#" id="showLoginForm">Inicia sesión</a>
+            </p>
+        </div>
+        
+        <!-- Formulario de enlace mágico -->
+        <div class="auth-form-container" id="magicLinkForm">
+            <form class="auth-form" id="magicLinkFormElement">
+                <div class="form-group">
+                    <label for="magicLinkEmail">Correo electrónico</label>
+                    <input type="email" id="magicLinkEmail" class="auth-input" required>
+                </div>
+                <button type="submit" class="auth-btn" id="sendMagicLinkBtn">Enviar enlace mágico</button>
+            </form>
+            
+            <p class="auth-link">
+                <a href="#" id="backToLogin">Volver a inicio de sesión</a>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Incluir el script de Supabase desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Incluir nuestro servicio de Supabase -->
+    <script src="supabase.js"></script>
+    
+    <!-- Script para manejar la autenticación -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elementos del DOM
+        const authTabs = document.querySelectorAll('.auth-tab');
+        const authForms = document.querySelectorAll('.auth-form-container');
+        const loginForm = document.getElementById('loginFormElement');
+        const registerForm = document.getElementById('registerFormElement');
+        const magicLinkForm = document.getElementById('magicLinkFormElement');
+        const showRegisterFormBtn = document.getElementById('showRegisterForm');
+        const showLoginFormBtn = document.getElementById('showLoginForm');
+        const magicLinkBtn = document.getElementById('magicLinkBtn');
+        const backToLoginBtn = document.getElementById('backToLogin');
+        const authError = document.getElementById('authError');
+        const authSuccess = document.getElementById('authSuccess');
+        
+        // Verificar si hay parámetros de error en la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorMsg = urlParams.get('error');
+        
+        if (errorMsg) {
+            showError(decodeURIComponent(errorMsg));
+            
+            // Limpiar la URL para no mostrar el error nuevamente al recargar
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+        
+        // Cambiar entre pestañas
+        authTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Activar la pestaña
+                authTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Mostrar el formulario correspondiente
+                authForms.forEach(form => form.classList.remove('active'));
+                if (tabId === 'login') {
+                    document.getElementById('loginForm').classList.add('active');
+                } else if (tabId === 'register') {
+                    document.getElementById('registerForm').classList.add('active');
+                }
+                
+                // Ocultar mensajes
+                hideMessages();
+            });
+        });
+        
+        // Mostrar formulario de registro
+        showRegisterFormBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            authTabs.forEach(t => t.classList.remove('active'));
+            authTabs[1].classList.add('active');
+            
+            authForms.forEach(form => form.classList.remove('active'));
+            document.getElementById('registerForm').classList.add('active');
+            
+            hideMessages();
+        });
+        
+        // Mostrar formulario de inicio de sesión
+        showLoginFormBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            authTabs.forEach(t => t.classList.remove('active'));
+            authTabs[0].classList.add('active');
+            
+            authForms.forEach(form => form.classList.remove('active'));
+            document.getElementById('loginForm').classList.add('active');
+            
+            hideMessages();
+        });
+        
+        // Mostrar formulario de enlace mágico
+        magicLinkBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            authForms.forEach(form => form.classList.remove('active'));
+            document.getElementById('magicLinkForm').classList.add('active');
+            
+            hideMessages();
+        });
+        
+        // Volver al inicio de sesión desde el formulario de enlace mágico
+        backToLoginBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            authForms.forEach(form => form.classList.remove('active'));
+            document.getElementById('loginForm').classList.add('active');
+            
+            hideMessages();
+        });
+        
+        // Manejar inicio de sesión
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Validar campos
+            if (!email || !password) {
+                showError('Por favor, completa todos los campos');
+                return;
+            }
+            
+            try {
+                const { data, error } = await SupabaseService.auth.signIn(email, password);
+                
+                if (error) {
+                    showError(error.message || 'Error al iniciar sesión');
+                    return;
+                }
+                
+                showSuccess('Inicio de sesión exitoso. Redirigiendo...');
+                
+                // Redirigir al usuario a la página principal después de un breve retraso
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } catch (err) {
+                showError('Error inesperado. Por favor, intenta de nuevo más tarde.');
+                console.error(err);
+            }
+        });
+        
+        // Manejar registro
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validar campos
+            if (!email || !password || !confirmPassword) {
+                showError('Por favor, completa todos los campos');
+                return;
+            }
+            
+            // Validar que las contraseñas coincidan
+            if (password !== confirmPassword) {
+                showError('Las contraseñas no coinciden');
+                return;
+            }
+            
+            try {
+                const { data, error } = await SupabaseService.auth.signUp(email, password);
+                
+                if (error) {
+                    showError(error.message || 'Error al registrarse');
+                    return;
+                }
+                
+                showSuccess('Registro exitoso. Por favor, verifica tu correo electrónico para confirmar tu cuenta.');
+                
+                // Limpiar formulario
+                registerForm.reset();
+                
+                // Mostrar formulario de inicio de sesión después de un breve retraso
+                setTimeout(() => {
+                    showLoginFormBtn.click();
+                }, 3000);
+            } catch (err) {
+                showError('Error inesperado. Por favor, intenta de nuevo más tarde.');
+                console.error(err);
+            }
+        });
+        
+        // Manejar enlace mágico
+        magicLinkForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('magicLinkEmail').value;
+            
+            // Validar campo
+            if (!email) {
+                showError('Por favor, ingresa tu correo electrónico');
+                return;
+            }
+            
+            try {
+                const { data, error } = await SupabaseService.auth.signInWithMagicLink(email);
+                
+                if (error) {
+                    showError(error.message || 'Error al enviar enlace mágico');
+                    return;
+                }
+                
+                showSuccess('Enlace mágico enviado. Por favor, revisa tu correo electrónico.');
+                
+                // Limpiar formulario
+                magicLinkForm.reset();
+            } catch (err) {
+                showError('Error inesperado. Por favor, intenta de nuevo más tarde.');
+                console.error(err);
+            }
+        });
+        
+        // Verificar si el usuario ya está autenticado
+        async function checkAuth() {
+            try {
+                const { data, error } = await SupabaseService.auth.getSession();
+                
+                if (data && data.session) {
+                    // El usuario ya está autenticado, redirigir a la página principal
+                    window.location.href = 'index.html';
+                }
+            } catch (err) {
+                console.error('Error al verificar autenticación:', err);
+            }
+        }
+        
+        // Mostrar mensaje de error
+        function showError(message) {
+            authError.textContent = message;
+            authError.style.display = 'block';
+            authSuccess.style.display = 'none';
+        }
+        
+        // Mostrar mensaje de éxito
+        function showSuccess(message) {
+            authSuccess.textContent = message;
+            authSuccess.style.display = 'block';
+            authError.style.display = 'none';
+        }
+        
+        // Ocultar mensajes
+        function hideMessages() {
+            authError.style.display = 'none';
+            authSuccess.style.display = 'none';
+        }
+        
+        // Verificar autenticación al cargar la página
+        checkAuth();
+    });
+    </script>
+</body>
+</html> 

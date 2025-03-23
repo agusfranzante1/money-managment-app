@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión Financiera</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+    
+    <!-- Incluir el script de Supabase desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Incluir nuestro servicio de Supabase -->
+    <script src="supabase.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-wallet"></i>
+                <span>Gestión Financiera</span>
+                <a href="#" id="distributionCalculatorLink" class="nav-link">
+                    <span>Calculadora de Distribución</span>
+                </a>
+            </div>
+            <div class="nav-buttons">
+                <button id="navRegisterBtn" class="add-button">
+                    <i class="fas fa-plus"></i> Registros
+                </button>
+                <button id="navTransferBtn" class="transfer-button">
+                    <i class="fas fa-exchange-alt"></i> Transferir
+                </button>
+                <button id="navLogoutBtn" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </button>
+            </div>
+        </nav>
+        
+        <div class="wallets-container">
+            <div id="walletsList" class="wallets-grid"></div>
+            <button id="addWalletBtn" class="add-wallet-btn">+ Añadir Billetera</button>
+        </div>
+
+        <div class="cash-flow-container">
+            <div class="cash-flow-header">
+                <div class="header-with-buttons">
+                    <h2><span id="year"></span></h2>
+                    <button id="showHistoryBtn" class="show-history-btn">
+                        <i class="fas fa-history"></i> Ver Historial
+                    </button>
+                </div>
+                <div class="currency-manager">
+                    <button id="addCurrencyBtn" class="add-currency-btn">+ Agregar Moneda</button>
+                    <div class="currencies-list" id="currenciesList"></div>
+                </div>
+            </div>
+            
+            <!-- Sección de historial de transacciones (inicialmente oculta) -->
+            <div id="transactionHistory" class="transaction-history" style="display: none;">
+                <div class="history-header">
+                    <h3>Historial de Transacciones</h3>
+                    <button id="closeHistoryBtn" class="close-history-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="history-filters">
+                    <select id="walletFilter">
+                        <option value="all">Todas las billeteras</option>
+                    </select>
+                    <select id="typeFilter">
+                        <option value="all">Todos los tipos</option>
+                        <option value="income">Ingresos</option>
+                        <option value="expense">Egresos</option>
+                        <option value="transfer">Transferencias</option>
+                    </select>
+                    <div class="date-filter">
+                        <label>Desde:</label>
+                        <input type="date" id="dateFromFilter">
+                    </div>
+                    <div class="date-filter">
+                        <label>Hasta:</label>
+                        <input type="date" id="dateToFilter">
+                    </div>
+                </div>
+                <div class="history-list" id="historyList">
+                    <!-- El contenido se llenará dinámicamente -->
+                </div>
+            </div>
+
+            <div class="transaction-form">
+                <h3>Registrar Movimiento</h3>
+                <form id="transactionForm">
+                    <select id="transactionType" required>
+                        <option value="">Seleccione tipo de movimiento</option>
+                        <option value="income">Ingreso</option>
+                        <option value="expense">Egreso</option>
+                    </select>
+
+                    <select id="walletSelect" required>
+                        <option value="">Seleccione billetera</option>
+                    </select>
+
+                    <select id="categorySelect" required>
+                        <option value="">Seleccione categoría</option>
+                    </select>
+
+                    <input type="number" id="amount" placeholder="Monto" required step="0.01">
+                    <input type="text" id="description" placeholder="Descripción">
+                    
+                    <button type="submit">Registrar</button>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <table id="cashFlowTable" class="cash-flow-table">
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th>Ene</th>
+                            <th>Feb</th>
+                            <th>Mar</th>
+                            <th>Abr</th>
+                            <th>May</th>
+                            <th>Jun</th>
+                            <th>Jul</th>
+                            <th>Ago</th>
+                            <th>Sep</th>
+                            <th>Oct</th>
+                            <th>Nov</th>
+                            <th>Dic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- El contenido se llenará dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Diálogo de calculadora de distribución de porcentajes -->
+    <div class="overlay" id="distributionCalculatorOverlay" style="display: none;">
+        <div class="distribution-calculator">
+            <div class="calculator-header">
+                <h3>Calculadora de Distribución de Porcentajes</h3>
+                <button class="close-button" id="closeCalculatorBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="calculator-content">
+                <div class="input-group total-amount">
+                    <label for="totalAmount">Monto Total:</label>
+                    <div class="amount-input-container">
+                        <input type="number" id="totalAmount" placeholder="Ingrese el monto total" min="0" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="distribution-container">
+                    <div class="distribution-row">
+                        <div class="distribution-item">
+                            <h4>Inversión</h4>
+                            <div class="percentage-input-container">
+                                <input type="number" id="investmentPercentage" min="0" max="100" step="1" value="25">
+                                <span class="percentage-symbol">%</span>
+                            </div>
+                            <div class="amount-result" id="investmentAmount">0.00</div>
+                        </div>
+                        
+                        <div class="distribution-item">
+                            <h4>Ahorro Neto</h4>
+                            <div class="percentage-input-container">
+                                <input type="number" id="savingsPercentage" min="0" max="100" step="1" value="25">
+                                <span class="percentage-symbol">%</span>
+                            </div>
+                            <div class="amount-result" id="savingsAmount">0.00</div>
+                        </div>
+                    </div>
+                    
+                    <div class="distribution-row">
+                        <div class="distribution-item">
+                            <h4>Gastos</h4>
+                            <div class="percentage-input-container">
+                                <input type="number" id="expensesPercentage" min="0" max="100" step="1" value="40">
+                                <span class="percentage-symbol">%</span>
+                            </div>
+                            <div class="amount-result" id="expensesAmount">0.00</div>
+                        </div>
+                        
+                        <div class="distribution-item">
+                            <h4>Ahorro con Objetivo</h4>
+                            <div class="percentage-input-container">
+                                <input type="number" id="targetSavingsPercentage" min="0" max="100" step="1" value="10">
+                                <span class="percentage-symbol">%</span>
+                            </div>
+                            <div class="amount-result" id="targetSavingsAmount">0.00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="total-percentage-display">
+                    <div class="percentage-bar">
+                        <div class="percentage-segment investment" id="investmentSegment"></div>
+                        <div class="percentage-segment savings" id="savingsSegment"></div>
+                        <div class="percentage-segment expenses" id="expensesSegment"></div>
+                        <div class="percentage-segment target-savings" id="targetSavingsSegment"></div>
+                    </div>
+                    <div class="total-percentage">
+                        Total: <span id="totalPercentage">100</span>%
+                    </div>
+                </div>
+                
+                <div class="calculator-buttons">
+                    <button id="calculateDistributionBtn" class="calculate-button">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Elemento oculto para verificar hash de enlace mágico -->
+    <div id="magicLinkVerification" style="display: none;">
+        <div class="verification-container">
+            <div class="verification-message">
+                <h3>Verificando acceso...</h3>
+                <p id="verificationText">Por favor, espera mientras completamos tu inicio de sesión.</p>
+                <div class="loader"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Script principal de la aplicación -->
+    <script src="app.js"></script>
+    
+    <!-- Script para verificar autenticación -->
+    <script>
+    (async function checkAuthentication() {
+        try {
+            const isAuthenticated = await SupabaseService.auth.isAuthenticated();
+            
+            if (!isAuthenticated) {
+                // Verificar si hay un hash en la URL para enlaces mágicos
+                const hash = window.location.hash;
+                if (hash) {
+                    // Verificar si hay error en el hash (enlace expirado o inválido)
+                    if (hash.includes('error=')) {
+                        // Extraer mensaje de error
+                        const errorDescription = decodeURIComponent(hash.split('error_description=')[1]?.split('&')[0] || 'Enlace inválido');
+                        console.error('Error en enlace mágico:', errorDescription);
+                        
+                        // Redirigir a la página de autenticación con parámetro de error
+                        window.location.href = 'auth.html?error=' + encodeURIComponent(errorDescription);
+                        return;
+                    }
+                    
+                    // Si no hay error pero hay token, continuar con la verificación normal
+                    if (hash.includes('access_token')) {
+                        // Mostrar elemento de verificación
+                        document.getElementById('magicLinkVerification').style.display = 'block';
+                        
+                        // Determinar el tipo de verificación (enlace mágico o confirmación de correo)
+                        if (hash.includes('type=email_confirmation')) {
+                            document.getElementById('verificationText').textContent = 
+                                'Estamos confirmando tu correo electrónico. Por favor, espera unos segundos...';
+                        } else {
+                            document.getElementById('verificationText').textContent = 
+                                'Estamos procesando tu enlace mágico. Por favor, espera unos segundos...';
+                        }
+                        
+                        try {
+                            // Procesar el hash para completar el inicio de sesión
+                            await SupabaseService.auth.handleMagicLinkRedirect();
+                            // Actualizar la página después de un breve retraso
+                            setTimeout(() => {
+                                window.location.href = 'index.html';
+                            }, 1000);
+                            return;
+                        } catch (error) {
+                            console.error('Error al procesar enlace mágico:', error);
+                            // Redirigir a la página de autenticación si hay errores
+                            window.location.href = 'auth.html?error=' + encodeURIComponent('Error al procesar el enlace de acceso. Por favor, solicita un nuevo enlace.');
+                            return;
+                        }
+                    }
+                }
+                
+                // Redirigir al usuario a la página de inicio de sesión si no está autenticado
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            // Configurar evento para cerrar sesión
+            document.getElementById('navLogoutBtn').addEventListener('click', async function() {
+                try {
+                    await SupabaseService.auth.signOut();
+                    window.location.href = 'auth.html';
+                } catch (error) {
+                    console.error('Error al cerrar sesión:', error);
+                    alert('Error al cerrar sesión. Por favor, intenta de nuevo.');
+                }
+            });
+            
+            // Si el usuario está autenticado, inicializar la aplicación
+            if (typeof appInstance !== 'undefined' && appInstance.initialize) {
+                appInstance.initialize();
+            }
+        } catch (error) {
+            console.error('Error al verificar autenticación:', error);
+            // En caso de error, redirigir al usuario a la página de inicio de sesión
+            window.location.href = 'auth.html';
+        }
+    })();
+    </script>
+</body>
+</html> 

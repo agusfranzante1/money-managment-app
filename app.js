@@ -1827,31 +1827,33 @@ class FinanceManager {
             // Obtener categorías de gastos fijos para esta moneda
             const fixedExpenseCategories = new Set();
             
-            // No usamos categorías predefinidas para ninguna moneda
-            
             // Obtener categorías eliminadas para esta moneda
             const deletedFixedExpensesJSON = localStorage.getItem('deletedFixedExpenses') || '{}';
             const deletedFixedExpenses = JSON.parse(deletedFixedExpensesJSON);
             const deletedCurrencyFixedExpenses = deletedFixedExpenses[currency.code] || [];
+            
+            console.log(`UpdateCashFlowTable - Categorías de gastos fijos eliminadas para ${currency.code}:`, deletedCurrencyFixedExpenses);
             
             // Obtener categorías personalizadas para esta moneda
             const customFixedExpensesJSON = localStorage.getItem('customFixedExpenses') || '{}';
             const customFixedExpenses = JSON.parse(customFixedExpensesJSON);
             const customCurrencyFixedExpenses = customFixedExpenses[currency.code] || [];
             
-            // Agregar categorías personalizadas para esta moneda
-            customCurrencyFixedExpenses.forEach(cat => {
-                fixedExpenseCategories.add(cat);
-            });
+            // Agregar categorías personalizadas que no estén eliminadas
+            customCurrencyFixedExpenses
+                .filter(cat => !deletedCurrencyFixedExpenses.includes(cat))
+                .forEach(cat => {
+                    fixedExpenseCategories.add(cat);
+                });
             
-            // Buscar en transacciones existentes
+            // Buscar en transacciones existentes para categorías que no hayan sido eliminadas
             this.transactions.forEach(transaction => {
                 const wallet = this.wallets.find(w => w.id.toString() === transaction.walletId);
                 if (wallet && wallet.currency === currency.code && transaction.type === 'expense') {
                     const category = transaction.category || transaction.description;
                     
-                    // Incluir cualquier categoría personalizada para esta moneda
-                    if (customCurrencyFixedExpenses.includes(category)) {
+                    // Solo añadir si no está en la lista de eliminadas
+                    if (category && !deletedCurrencyFixedExpenses.includes(category)) {
                         fixedExpenseCategories.add(category);
                     }
                 }
@@ -2286,17 +2288,35 @@ class FinanceManager {
         const deletedCategoriesJSON = localStorage.getItem('deletedCategories');
         const deletedCategories = deletedCategoriesJSON ? JSON.parse(deletedCategoriesJSON) : {};
         
-        // Crear un conjunto para todas las categorías eliminadas de todas las monedas
+        // Obtener las categorías de gastos fijos eliminadas
+        const deletedFixedExpensesJSON = localStorage.getItem('deletedFixedExpenses');
+        const deletedFixedExpenses = deletedFixedExpensesJSON ? JSON.parse(deletedFixedExpensesJSON) : {};
+        
+        // Crear conjuntos para todas las categorías eliminadas de todas las monedas
         const allDeletedCategories = new Set();
+        const allDeletedFixedExpenses = new Set();
         
         // Recolectar todas las categorías eliminadas de todas las monedas
         Object.values(deletedCategories).forEach(categories => {
             categories.forEach(category => allDeletedCategories.add(category));
         });
         
+        // Recolectar todas las categorías de gastos fijos eliminadas
+        Object.values(deletedFixedExpenses).forEach(categories => {
+            categories.forEach(category => allDeletedFixedExpenses.add(category));
+        });
+        
+        console.log('Categorías de ingresos eliminadas:', [...allDeletedCategories]);
+        console.log('Categorías de gastos fijos eliminadas:', [...allDeletedFixedExpenses]);
+        
         // Filtrar las categorías eliminadas del array de categorías de ingresos
         this.categories.income = this.categories.income.filter(category => 
             !allDeletedCategories.has(category)
+        );
+        
+        // Filtrar las categorías eliminadas del array de categorías de gastos fijos
+        this.categories.fixedExpenses = this.categories.fixedExpenses.filter(category => 
+            !allDeletedFixedExpenses.has(category)
         );
     }
 

@@ -1423,23 +1423,25 @@ class FinanceManager {
             // Obtener todas las categorías de ingreso para esta moneda
             const incomeCategories = new Set();
             
-            // Añadir categorías desde las transacciones
+            // Obtener las categorías eliminadas para esta moneda
+            const deletedCategoriesJSON = localStorage.getItem('deletedCategories');
+            const deletedCategories = deletedCategoriesJSON ? JSON.parse(deletedCategoriesJSON) : {};
+            const deletedCurrencyCategories = deletedCategories[currency.code] || [];
+            
+            console.log(`UpdateCashFlowTable - Categorías de ingresos eliminadas para ${currency.code}:`, deletedCurrencyCategories);
+            
+            // Añadir categorías desde las transacciones que no estén eliminadas
             this.transactions.forEach(transaction => {
                 const wallet = this.wallets.find(w => w.id.toString() === transaction.walletId);
                 if (wallet && wallet.currency === currency.code && 
                     (transaction.type === 'income' || transaction.type === 'transfer_in')) {
-                    if (transaction.category) {
-                        incomeCategories.add(transaction.category);
-                    } else if (transaction.description) {
-                        incomeCategories.add(transaction.description);
+                    let category = transaction.category || transaction.description;
+                    // Solo añadir si no está en la lista de eliminadas
+                    if (category && !deletedCurrencyCategories.includes(category)) {
+                        incomeCategories.add(category);
                     }
                 }
             });
-            
-            // Verificar si hay categorías eliminadas
-            const deletedCategoriesJSON = localStorage.getItem('deletedCategories');
-            const deletedCategories = deletedCategoriesJSON ? JSON.parse(deletedCategoriesJSON) : {};
-            const deletedCurrencyCategories = deletedCategories[currency.code] || [];
             
             // Obtener categorías personalizadas para esta moneda
             const customCategoriesJSON = localStorage.getItem('customCategories') || '{}';
@@ -1449,9 +1451,7 @@ class FinanceManager {
             // Añadir categorías personalizadas que no estén eliminadas
             currencyCustomCategories
                 .filter(cat => !deletedCurrencyCategories.includes(cat))
-                .forEach(cat => {
-                    incomeCategories.add(cat);
-                });
+                .forEach(cat => incomeCategories.add(cat));
             
             // No agregamos categorías predefinidas para ninguna moneda
             
@@ -2226,14 +2226,18 @@ class FinanceManager {
                 return true;
             }
             
-            // Eliminar si la categoría coincide
-            if (transaction.category === category) {
+            // Si el tipo de transacción es de ingreso y la categoría coincide, eliminar
+            if (transaction.type === 'income' && transaction.category === category) {
+                console.log(`Eliminando transacción de ingreso con categoría ${category}`);
                 return false;
             }
             
             // Eliminar también si la descripción coincide exactamente con el nombre de la categoría
-            if (transaction.description === category || 
-                transaction.description === `Categoría ${category} añadida`) {
+            // y es una transacción de ingreso
+            if (transaction.type === 'income' && 
+                (transaction.description === category || 
+                transaction.description === `Categoría ${category} añadida`)) {
+                console.log(`Eliminando transacción de ingreso con descripción ${transaction.description}`);
                 return false;
             }
             
@@ -2242,13 +2246,7 @@ class FinanceManager {
         });
         console.log(`Transacciones filtradas: de ${transaccionesPrevias} a ${this.transactions.length}`);
         
-        // Verificar si es una categoría predefinida según la moneda
-        let isDefaultCategory = false;
-        
-        // No hay categorías predefinidas para ninguna moneda
-        
         // Para cualquier moneda, añadir a la lista de categorías eliminadas
-        // Obtener las categorías eliminadas del localStorage
         const deletedCategoriesJSON = localStorage.getItem('deletedCategories');
         const deletedCategories = deletedCategoriesJSON ? JSON.parse(deletedCategoriesJSON) : {};
         
@@ -2257,22 +2255,21 @@ class FinanceManager {
             deletedCategories[currencyCode] = [];
         }
         
-        // Si es una categoría por defecto o queremos forzar su eliminación permanente
-        if (isDefaultCategory || true) {
-            // Agregar la categoría si no está ya en la lista
-            if (!deletedCategories[currencyCode].includes(category)) {
-                deletedCategories[currencyCode].push(category);
-                localStorage.setItem('deletedCategories', JSON.stringify(deletedCategories));
-                console.log(`Categoría ${category} añadida a deletedCategories para ${currencyCode}`);
-            }
+        // Verificar si la categoría ya está en la lista de eliminadas
+        if (!deletedCategories[currencyCode].includes(category)) {
+            deletedCategories[currencyCode].push(category);
+            localStorage.setItem('deletedCategories', JSON.stringify(deletedCategories));
+            console.log(`Categoría ${category} añadida a deletedCategories para ${currencyCode}`, deletedCategories);
         } else {
-            // Si es una categoría personalizada, verificar si está en la lista de categorías personalizadas
-            let customCategories = JSON.parse(localStorage.getItem('customCategories') || '{}');
-            if (customCategories[currencyCode]) {
-                customCategories[currencyCode] = customCategories[currencyCode].filter(cat => cat !== category);
-                localStorage.setItem('customCategories', JSON.stringify(customCategories));
-                console.log(`Categoría ${category} eliminada de customCategories para ${currencyCode}`);
-            }
+            console.log(`Categoría ${category} ya estaba en deletedCategories para ${currencyCode}`);
+        }
+        
+        // También eliminar de las categorías personalizadas si existe
+        let customCategories = JSON.parse(localStorage.getItem('customCategories') || '{}');
+        if (customCategories[currencyCode]) {
+            customCategories[currencyCode] = customCategories[currencyCode].filter(cat => cat !== category);
+            localStorage.setItem('customCategories', JSON.stringify(customCategories));
+            console.log(`Categoría ${category} eliminada de customCategories para ${currencyCode}`, customCategories);
         }
         
         // Actualizar las categorías cargadas
@@ -2281,6 +2278,15 @@ class FinanceManager {
         // Mostrar mensaje de éxito
         this.showSuccessMessage(`Categoría "${category}" eliminada correctamente`);
         console.log(`Categoría "${category}" eliminada correctamente`);
+        
+        // Actualizar los campos de categoría en los diálogos abiertos
+        const categorySelect = document.getElementById('registerCategorySelect');
+        if (categorySelect) {
+            const typeSelect = document.getElementById('registerTypeSelect');
+            if (typeSelect && typeSelect.value === 'income') {
+                this.updateRegisterCategoryOptions('income', categorySelect);
+            }
+        }
     }
 
     loadCategories() {
